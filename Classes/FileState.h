@@ -11,6 +11,7 @@ class FileState {
     bool fileExistence;
 public:
     FileState() = default;
+    FileState(const QString &file);
     FileState(QString path, qint64 size, bool existence);
     void setExists(bool existence);
     void setFilePath(QString path);

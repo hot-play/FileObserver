@@ -1,6 +1,13 @@
 #include "FileWatcher.h"
 #include <QVector>
 #include <Classes/FileState.h>
+#include <Classes/ChangeNotifier.h>
+
+
+
+FileWatcher::FileWatcher(const FileState &fileState) {
+    watchedFiles.push_back(fileState);
+}
 
 void FileWatcher::addNewFile(const FileState &fileState) {
     watchedFiles.push_back(fileState);
@@ -11,18 +18,18 @@ void FileWatcher::changeFileState(int position, const FileState &fileState) {
 }
 
 bool FileWatcher::checkExistChangesByPosition(int position) {
-    FileState savedState = watchedFiles.takeAt(position);
-    FileState currentState = savedState.getFilePath();
-    bool isChanged = (savedState.isExists() == currentState.isExists());
+    FileState savedState = watchedFiles[position];
+    FileState currentState(savedState.getFilePath());
+    bool isChanged = (savedState.isExists() != currentState.isExists());
     if (isChanged)
         changeFileState(position, currentState);
     return isChanged;
 }
 
 bool FileWatcher::checkSizeChangesByPosition(int position) {
-    FileState savedState = watchedFiles.takeAt(position);
-    FileState currentState = savedState.getFilePath();
-    bool isChanged = (savedState.getFileSize() == currentState.getFileSize());
+    FileState savedState = watchedFiles[position];
+    FileState currentState(savedState.getFilePath());
+    bool isChanged = (savedState.getFileSize() != currentState.getFileSize());
     if (isChanged)
         changeFileState(position, currentState);
     return isChanged;
@@ -30,9 +37,9 @@ bool FileWatcher::checkSizeChangesByPosition(int position) {
 
 QVector<FileState> FileWatcher::checkExistChanges() {
     QVector<FileState> changedStates;
-    for (int i=0; i<watchedFiles.count; i++) {
+    for (int i = 0; i < watchedFiles.count(); i++) {
         if (this->checkExistChangesByPosition(i)) {
-            changedStates.push_back(watchedFiles.takeAt(i));
+            changedStates.push_back(watchedFiles[i]);
         }
     }
     return changedStates;
@@ -40,31 +47,33 @@ QVector<FileState> FileWatcher::checkExistChanges() {
 
 QVector<FileState> FileWatcher::checkSizeChanges() {
     QVector<FileState> changedStates;
-    for (int i = 0; i < watchedFiles.count; i++) {
+    for (int i = 0; i < watchedFiles.count(); i++) {
         if (this->checkSizeChangesByPosition(i)) {
-            changedStates.push_back(watchedFiles.takeAt(i));
+            changedStates.push_back(watchedFiles[i]);
         }
     }
     return changedStates;
 }
 
-void runWatching() {
-
-    auto loopBody = [this]() {
-            QVector<FileState> existChange = checkExistChanges();
-            QVector<FileState> sizeChange = checkSizeChanges();
-            if (!existChange.isEmpty()) {
-                for (int i = 0 ; i < existChange.count; i++) {
-                    existChanged(existChange[i].getFilePath(), existChange[i].isExists());
-                }
+void FileWatcher::runWatching() {
+    connect(this, &FileWatcher::existChanged, &ChangeNotifier::logExistChanges);
+    connect(this, &FileWatcher::sizeChanged, &ChangeNotifier::logSizeChanges);
+    for (int i = 0 ; i < watchedFiles.count(); i++) {
+        existChanged(watchedFiles[i].getFilePath(), watchedFiles[i].isExists());
+        sizeChanged(watchedFiles[i].getFilePath(), watchedFiles[i].getFileSize());
+    }
+    while (1) {
+        QVector<FileState> existChanges = checkExistChanges();
+        QVector<FileState> sizeChanges = checkSizeChanges();
+        if (!existChanges.isEmpty()) {
+            for (int i = 0 ; i < existChanges.count(); i++) {
+                existChanged(existChanges[i].getFilePath(), existChanges[i].isExists());
             }
-            if (!sizeChange.isEmpty()) {
-                for (int i = 0; i < existChange.count; i++) {
-                    existChanged(existChange[i].getFilePath(), existChange[i].getFileSize());
-                }
+        }
+        if (!sizeChanges.isEmpty()) {
+            for (int i = 0; i < sizeChanges.count(); i++) {
+                sizeChanged(sizeChanges[i].getFilePath(), sizeChanges[i].getFileSize());
             }
-    };
-    while () {
-        loopBody();
+        }
     }
 }

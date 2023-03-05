@@ -1,17 +1,16 @@
 #include "FileState.h"
+#include <iostream>
 
 FileState::FileState(QString path, qint64 size, bool existence) :
     filePath(path),
     fileSize(size),
     fileExistence(existence) {}
 
-FileState FileState::initByPath(const QString &file) {
+FileState::FileState(const QString &file) {
     QFileInfo fileInfo(file);
-    FileState newFileState;
-    newFileState.filePath = fileInfo.absoluteFilePath();
-    newFileState.fileExistence = fileInfo.exists();
-    newFileState.fileSize = fileInfo.size();
-    return newFileState;
+    filePath = fileInfo.absoluteFilePath();
+    fileExistence = fileInfo.exists();
+    fileSize = fileInfo.size();
 }
 
 void FileState::setExists(bool existence) {

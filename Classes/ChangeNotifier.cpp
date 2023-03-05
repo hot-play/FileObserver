@@ -1,13 +1,15 @@
 #include "ChangeNotifier.h"
+#include <iostream>
 
 using namespace std;
 
-void logExistChanges(QString fileName,bool isExist) {
+void ChangeNotifier::logExistChanges(QString fileName,bool isExist) {
     if (isExist) {
-        cout << "Файл: " << fileName << " - существует"<< endl;
+        wcout << L"Файл: " << fileName.toStdWString() << L" - существует"<< endl;
+    } else {
+        wcout << L"Файл: " << fileName.toStdWString() << L" - не существует"<< endl;
     }
-    cout << "Файл: " << fileName << " - не существует"<< endl;
 }
-void logSizeChanges(QString fileName,qint64 size) {
-    cout << "Файл: " << fileName << " имеет размер: "<< size<< " байт"<< endl;
+void ChangeNotifier::logSizeChanges(QString fileName,qint64 size) {
+    wcout << L"Файл: " << fileName.toStdWString() << L" имеет размер: "<< size << L" байт"<< endl;
 }

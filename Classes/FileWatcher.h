@@ -2,11 +2,13 @@
 #define FILEWATCHER_H
 
 #include <Classes/FileState.h>
+
 #include <QVector>
 #include <QTime>
 
 class FileWatcher : public QObject
 {
+    Q_OBJECT
     QVector<FileState> watchedFiles;
 public:
     FileWatcher() = default;
