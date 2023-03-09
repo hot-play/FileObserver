@@ -6,8 +6,11 @@
 #include <QString>
 
 class FileState {
+    // Путь до файла, в конструкторах используется абсолютный путь
     QString filePath;
+    // Размер файла в байтах
     qint64 fileSize;
+    // Состояние файла: 1 - сщуествует, 0 - не существует
     bool fileExistence;
 public:
     FileState() = default;

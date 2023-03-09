@@ -20,7 +20,6 @@ SOURCES += main.cpp \
     Classes/FileWatcher.cpp \
     Classes/ChangeNotifier.cpp
 
-HEADERS += \
-    Classes/FileState.h \
+HEADERS += Classes/FileState.h \
     Classes/FileWatcher.h \
     Classes/ChangeNotifier.h
