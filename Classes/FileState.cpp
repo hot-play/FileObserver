@@ -7,7 +7,9 @@ FileState::FileState(QString path, qint64 size, bool existence) :
     fileExistence(existence) {}
 
 FileState::FileState(const QString &file) {
+    // Для инициализации статистики используем путь к файлу
     QFileInfo fileInfo(file);
+    // Необходимую статистику записываем
     filePath = fileInfo.absoluteFilePath();
     fileExistence = fileInfo.exists();
     fileSize = fileInfo.size();
